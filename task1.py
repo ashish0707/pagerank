@@ -50,11 +50,7 @@ class InlinkGenerator(Crawler):
                     with open(title, 'a') as _file_:
                         _file_.write(raw_data)
 
-
-
     def calcuatePageRank(self, ExplodedList , sinkNodeList , inlink_graph, dampingFactor = 0.85 ):
-
-
         N = len(ExplodedList);
         print "inlink graph size :=> %d , ExplodedGraph Size : %d" %(len(inlink_graph),N)
 
@@ -70,7 +66,7 @@ class InlinkGenerator(Crawler):
             for node in ExplodedList:
                 node.newPageRank = (1 - dampingFactor) / N
                 node.newPageRank += dampingFactor * sinkPR / N
-                print "newpageRank for " + node.title + "%f" %node.newPageRank
+                print "newpageRank for " + node.title + "%f" % node.newPageRank
                 for childnode in inlink_graph[node]:
                     node.newPageRank += dampingFactor * childnode.pageRank / childnode.numberOfOutlinks
 
@@ -102,14 +98,14 @@ class InlinkGenerator(Crawler):
         for node in ExplodedList:
             self.save_to_file(title_of_file, node.title + " ==> " + str(node.pageRank) + "\n")
 
-
-url = "https://en.wikipedia.org/wiki/Sustainable_energy"
-myCrawler = InlinkGenerator(url)
-myCrawler.set_pages_to_crawl(5)
-myCrawler.setFileName("task1.txt")
-myCrawler.addToMandatoryList('/wiki/')
-myCrawler.addToDisallowedList(':')
-myCrawler.start()
-myCrawler.process_inlinks()
-myCrawler.store_pagerank("pagerank.txt", myCrawler.getPageRank())
+    def start(self):
+        url = "https://en.wikipedia.org/wiki/Sustainable_energy"
+        myCrawler = InlinkGenerator(url)
+        myCrawler.set_pages_to_crawl(5)
+        myCrawler.setFileName("task1.txt")
+        myCrawler.addToMandatoryList('/wiki/')
+        myCrawler.addToDisallowedList(':')
+        myCrawler.start()
+        myCrawler.process_inlinks()
+        myCrawler.store_pagerank("pagerank.txt", myCrawler.getPageRank())
 

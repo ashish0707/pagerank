@@ -6,27 +6,28 @@ from Webcrawler import Node
 
 url = "https://en.wikipedia.org/wiki/Sustainable_energy"
 myCrawler = InlinkGenerator(url)
-A = Node(0,'a')
+
+A = Node(0, 'a')
 A.setNoOfOutlinks(3)
 A.setTitle('A')
 
-B = Node(0,'b')
+B = Node(0, 'b')
 B.setNoOfOutlinks(4)
 B.setTitle('B')
 
-C = Node(0,'c')
+C = Node(0, 'c')
 C.setNoOfOutlinks(2)
 C.setTitle('C')
 
-D = Node(0,'d')
+D = Node(0, 'd')
 D.setNoOfOutlinks(4)
 D.setTitle('D')
 
-E = Node(0,'e')
+E = Node(0, 'e')
 E.setNoOfOutlinks(1)
 E.setTitle('E')
 
-F = Node(0,'f')
+F = Node(0, 'f')
 F.setNoOfOutlinks(3)
 F.setTitle('F')
 
@@ -65,5 +66,5 @@ sorted(inlink_graph.items())
 print inlink_graph
 sinkNodeList=[]
 
-myCrawler.store_pagerank("pagerank.txt", myCrawler.calcuatePageRank(ExplodedList, sinkNodeList, inlink_graph))
+myCrawler.store_pagerank("test_pagerank.txt", myCrawler.calcuatePageRank(ExplodedList, sinkNodeList, inlink_graph))
 
