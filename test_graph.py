@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+import math
+
 from InlinkGenerator import InlinkGenerator
 from Webcrawler import Node
 
@@ -33,11 +35,13 @@ F.setTitle('F')
 
 ExplodedList = []
 ExplodedList.append(A)
-ExplodedList.append(B)
-ExplodedList.append(C)
 ExplodedList.append(D)
 ExplodedList.append(E)
 ExplodedList.append(F)
+ExplodedList.append(B)
+ExplodedList.append(C)
+
+
 
 inLink = []
 inLink.append((A,D))
@@ -63,8 +67,60 @@ for k, v in inLink:
     inlink_graph[k].append(v)
 
 sorted(inlink_graph.items())
-print inlink_graph
+
+print "ExplodedList : \n"
+for node in ExplodedList:
+    print node.url
+
+
+print "Inlink graph : \n"
+for key,value in inlink_graph.items():
+    print key.url + " :=> "
+    for v in value:
+        print v.url + " "
+    print "\n"
+
 sinkNodeList=[]
 
-myCrawler.store_pagerank("test_pagerank.txt", myCrawler.calcuatePageRank(ExplodedList, sinkNodeList, inlink_graph))
+
+def calcuatePageRank(ExplodedList, sinkNodeList, inlink_graph, dampingFactor=0.85):
+    N = len(ExplodedList);
+    print "inlink graph size :=> %d , ExplodedGraph Size : %d" % (len(inlink_graph), N)
+
+    for node in ExplodedList:
+        node.setPageRank(1.0 / N)
+
+    while myCrawler.isConvergenceReached():
+        sinkPR = 0
+
+        for node in sinkNodeList:
+            sinkPR += node.pageRank
+
+        for node in ExplodedList:
+            node.newPageRank = (1 - dampingFactor) / N
+            node.newPageRank += dampingFactor * sinkPR / N
+
+
+            for childnode in inlink_graph[node]:
+                print "node.newPageRank %f" %node.newPageRank
+                print "ChildNode Url :==>" + childnode.url
+                print "ChildNode pageRank :==> %f" % childnode.pageRank
+                print "childnode.numberOfOutlinks :==> %f" %childnode.numberOfOutlinks
+                print "D* childnode.pageRank / childnode.numberOfOutlinks :==> %f" % (dampingFactor * childnode.pageRank / childnode.numberOfOutlinks)
+                node.newPageRank += dampingFactor * childnode.pageRank / childnode.numberOfOutlinks
+                print "new pagerank %f" % node.newPageRank
+
+        sEntrophy = 0
+        for node in ExplodedList:
+            node.pageRank = node.newPageRank
+
+        for node in ExplodedList:
+            sEntrophy += node.pageRank * math.log(node.pageRank, 2.0)
+
+        myCrawler.perprexity.append((2 ** (sEntrophy * -1)))
+
+    return ExplodedList
+
+myCrawler.store_pagerank("test_pagerank.txt",
+                         calcuatePageRank(ExplodedList, sinkNodeList, inlink_graph))
 

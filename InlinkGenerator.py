@@ -4,8 +4,6 @@ from collections import defaultdict
 from Webcrawler import Node
 
 
-
-
 class InlinkGenerator(Crawler):
 
     inlink_list = [];
@@ -50,7 +48,7 @@ class InlinkGenerator(Crawler):
                     with open(title, 'a') as _file_:
                         _file_.write(raw_data)
 
-    def calcuatePageRank(self, ExplodedList , sinkNodeList , inlink_graph, dampingFactor = 0.85 ):
+    def calcuatePageRank(self, ExplodedList , sinkNodeList , inlink_graph, OutLinkSet, dampingFactor = 0.85 ):
         N = len(ExplodedList);
         print "inlink graph size :=> %d , ExplodedGraph Size : %d" %(len(inlink_graph),N)
 
@@ -68,7 +66,7 @@ class InlinkGenerator(Crawler):
                 node.newPageRank += dampingFactor * sinkPR / N
                 print "newpageRank for " + node.title + "%f" % node.newPageRank
                 for childnode in inlink_graph[node]:
-                    node.newPageRank += dampingFactor * childnode.pageRank / childnode.numberOfOutlinks
+                    node.newPageRank += dampingFactor * childnode.pageRank / OutLinkSet[node.url]
 
             sEntrophy = 0
             for node in ExplodedList:
@@ -105,7 +103,9 @@ class InlinkGenerator(Crawler):
         tempPairList = []
         ParentNode = self.createNode(title)
         for value in childList:
-            tempPairList.append((ParentNode, self.createNode(value)))
+            childNode = self.createNode(value)
+            childNode.numberOfOutlinks += 1
+            tempPairList.append((ParentNode, childNode))
         return tempPairList
 
     def createNode(self,title):
@@ -113,8 +113,9 @@ class InlinkGenerator(Crawler):
         A.setTitle(title)
         return A
 
-    def createInlinkPairsFromFile(self, filename):
+    def createInLinkPairsFromFile(self, filename):
         inlinkPairList = []
+        visitedNodeList = []
         with open(filename, "r") as ins:
             for line in ins:
                 tempList = line.rstrip("\n").split(" ")
@@ -122,8 +123,12 @@ class InlinkGenerator(Crawler):
                 if tempList:
                     inlinkPairList.extend(self.createPairs(title, tempList))
                 else:
-                    inlinkPairList.append(self.createNode(title))
+                    n = self.createNode(title)
+                    if n not in visitedNodeList:
+                        visitedNodeList.append(n)
         return inlinkPairList
+
+
 
     def createGraphFromList(self, inlinkPairList):
         inlink_graph = defaultdict(list)
