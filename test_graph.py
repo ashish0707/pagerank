@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from task1 import InlinkGenerator
+from InlinkGenerator import InlinkGenerator
 from Webcrawler import Node
 
 
